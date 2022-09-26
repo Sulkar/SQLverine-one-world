@@ -1,0 +1,23 @@
+button {
+  display: inline-block;
+  padding: 0.35em 1em 0.15em;
+  border: 0;
+  margin: 0 0.3em 0.3em 0;
+  border-radius: 0.18em;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s;
+  background-color: #fff;
+}
+
+button:hover {
+  background-color: aliceblue;
+}
+
+.btnRun {
+  color: forestgreen;
+  float: right;
+  border-bottom: 0.15em solid forestgreen;
+  font-size: 1.3rem;
+}
