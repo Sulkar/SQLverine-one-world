@@ -8,15 +8,20 @@ import { EditorView, keymap } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 import { sql } from "@codemirror/lang-sql";
 
-import { MyClass } from "./MyClass";
+import { Alert } from "./Alert";
+import { DisplayResult } from "./DisplayResult";
+import { SqlUtil } from "./SqlUtil";
 
+const sqlUtil = new SqlUtil();
 
+new Alert("Hello World", "success");
 
 //bootstrap button
 const app = document.getElementById("app");
 const sqlWorldEditor = document.getElementById("sqlWorldEditor");
 
-//CodeMirror Editor
+//////////////////////
+//CodeMirror Editor //
 const myTheme = EditorView.theme({
   //Editorbereich und grauer Rand mit Zeilennummern
   ".cm-content, .cm-gutter": {
@@ -33,14 +38,48 @@ const myTheme = EditorView.theme({
   },
 });
 
-let view = new EditorView({
-  doc: "SELECT * FROM schueler",
+let codeMirror = new EditorView({
+  doc: "SELECT * FROM users",
   extensions: [basicSetup, myTheme, sql(), keymap.of(defaultKeymap)],
   parent: sqlWorldEditor,
 });
 
 //Run Button
 $("#btnExecuteSql").on("click", function () {
-  let codeMirrorValue = view.state.doc.toString();
+  let codeMirrorValue = codeMirror.state.doc.toString();
   console.log(codeMirrorValue);
+  new Alert("Hello World", "danger");
+
+  (async () => {
+    let tempQueryInfos = sqlUtil.getQueryInfos(codeMirrorValue);
+    let data = await globalDatabaseCRUD(codeMirrorValue);
+
+    //globalHideLoader("loaderDIV");
+    if (data["error"] == "") {
+      console.log(data["result"]);
+      new DisplayResult(data["result"], tempQueryInfos);
+    } else {
+      const tempError = data["error"]["errorInfo"];
+      new Alert(tempError, "danger");
+    }
+  })();
 });
+
+////
+
+// universal CRUD function
+async function globalDatabaseCRUD(query) {
+  return fetch("http://127.0.0.1/db/db_CRUD.php", {
+    method: "post",
+    body: JSON.stringify(query),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      return data;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}

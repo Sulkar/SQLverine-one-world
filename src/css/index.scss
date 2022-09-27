@@ -1,4 +1,4 @@
-button {
+.btnRun {
   display: inline-block;
   padding: 0.35em 1em 0.15em;
   border: 0;
@@ -11,7 +11,7 @@ button {
   background-color: #fff;
 }
 
-button:hover {
+.btnRun:hover {
   background-color: aliceblue;
 }
 
