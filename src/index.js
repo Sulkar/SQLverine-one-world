@@ -2,23 +2,46 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/index.scss";
 
 import $ from "jquery";
+import { v4 as uuidv4 } from "uuid";
 
+// code mirror imports
 import { defaultKeymap } from "@codemirror/commands";
 import { EditorView, keymap } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 import { sql } from "@codemirror/lang-sql";
 
+// local imports
 import { Alert } from "./Alert";
 import { DisplayResult } from "./DisplayResult";
 import { SqlUtil } from "./SqlUtil";
+import { ShareCopyButton } from "./ShareCopyButton";
+
+
+const sqlWorldEditor = document.getElementById("sqlWorldEditor");
+
+//create uuid
+let CURRENT_DB_UUID = undefined;
+let SHARED_DB = false;
 
 const sqlUtil = new SqlUtil();
+const shareCopyButton = new ShareCopyButton();
 
-new Alert("Hello World", "success");
+//function check for uuid in url or create new one
+function checkSharedDbUuid() {
+  let tempUrlParameterString = window.location.search;
+  const urlParameters = new URLSearchParams(tempUrlParameterString);
+  if (urlParameters.get("dbid") != undefined) {
+    CURRENT_DB_UUID = urlParameters.get("dbid");
+    SHARED_DB = true;
+    shareCopyButton.setLink(window.location.href);
+  } else {
+    CURRENT_DB_UUID = uuidv4();
+    SHARED_DB = false;
+  }
+}
 
-//bootstrap button
-const app = document.getElementById("app");
-const sqlWorldEditor = document.getElementById("sqlWorldEditor");
+checkSharedDbUuid();
+shareCopyButton.setDbUuid(CURRENT_DB_UUID);
 
 //////////////////////
 //CodeMirror Editor //
@@ -48,7 +71,6 @@ let codeMirror = new EditorView({
 $("#btnExecuteSql").on("click", function () {
   let codeMirrorValue = codeMirror.state.doc.toString();
   console.log(codeMirrorValue);
-  new Alert("Hello World", "danger");
 
   (async () => {
     let tempQueryInfos = sqlUtil.getQueryInfos(codeMirrorValue);
